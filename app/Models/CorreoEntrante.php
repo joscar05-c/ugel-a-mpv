@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CorreoEntrante extends Model
 {
+    protected $table = 'correos_entrantes';
     protected $fillable = [
         'message_id',
         'remitente_email',

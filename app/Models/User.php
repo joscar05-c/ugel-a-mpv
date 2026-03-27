@@ -15,8 +15,11 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name',
+        'dni_ruc',
         'email',
-        'password'
+        'password',
+        'area_id',
+        'es_externo'
     ];
 
     protected $hidden = [
@@ -34,5 +37,10 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    //a que area pertenece el trabajador
+    protected function area(){
+        return $this->belongsTo(Area::class);
     }
 }

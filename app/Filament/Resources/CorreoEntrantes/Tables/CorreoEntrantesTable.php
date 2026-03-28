@@ -9,7 +9,7 @@ use App\Models\TipoDocumento;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
+//use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -27,7 +27,7 @@ class CorreoEntrantesTable
             ->columns([
                 TextColumn::make('fecha_recepcion_correo')
                     ->label('Fecha')
-                    ->dateTime('d/m/Y', 'H:i')
+                    ->dateTime()
                     ->sortable(),
                 TextColumn::make('remitente_email')
                     ->label('Remitente')
@@ -77,41 +77,53 @@ class CorreoEntrantesTable
                             ->required(),
                     ])
                     ->action(function (array $data, $record) {
-                    // Usamos una Transacción para asegurar que todo se guarde o nada
-                    DB::transaction(function () use ($data, $record) {
+                        // Usamos una Transacción para asegurar que todo se guarde o nada
+                        DB::transaction(function () use ($data, $record) {
 
-                        // 1. Crear el Expediente
-                        $expediente = Expediente::create([
-                            'numero_registro' => 'AGP-' . date('Y') . '-' . str_pad(Expediente::count() + 1, 4, '0', STR_PAD_LEFT),
-                            'asunto' => $record->asunto,
-                            'tipo_documento_id' => $data['tipo_documento_id'],
-                            'email_remitente_temporal' => $record->remitente_email,
-                            'estado_actual_id' => 1, // Asumiendo que 1 es 'Pendiente' o 'Derivado'
-                            'area_actual_id' => $data['area_destino_id'],
-                            // usuario_origen_id queda null porque vino de un correo externo
-                        ]);
+                            // 1. Crear el Expediente
+                            $expediente = Expediente::create([
+                                'numero_registro' => 'AGP-' . date('Y') . '-' . str_pad(Expediente::count() + 1, 4, '0', STR_PAD_LEFT),
+                                'asunto' => $record->asunto,
+                                'tipo_documento_id' => $data['tipo_documento_id'],
+                                'email_remitente_temporal' => $record->remitente_email,
+                                'estado_actual_id' => 1, // Asumiendo que 1 es 'Pendiente' o 'Derivado'
+                                'area_actual_id' => $data['area_destino_id'],
+                                // usuario_origen_id queda null porque vino de un correo externo
+                            ]);
 
-                        // 2. Registrar el Movimiento (La Hoja de Ruta)
-                        Movimiento::create([
-                            'expediente_id' => $expediente->id,
-                            'area_origen_id' => auth()->user()->area_id ?? 1, // Área de quien está logueado (Jefe AGP)
-                            'usuario_origen_id' => auth()->id(),
-                            'area_destino_id' => $data['area_destino_id'],
-                            'estado_id' => 1,
-                            'proveido' => $data['proveido'],
-                        ]);
+                            // 2. Registrar el Movimiento (La Hoja de Ruta)
+                            $movimiento = Movimiento::create([
+                                'expediente_id' => $expediente->id,
+                                'area_origen_id' => auth()->user()->area_id ?? 1, // Área de quien está logueado (Jefe AGP)
+                                'usuario_origen_id' => auth()->id(),
+                                'area_destino_id' => $data['area_destino_id'],
+                                'estado_id' => 1,
+                                'proveido' => $data['proveido'],
+                            ]);
+                            // 3. ¡LO NUEVO!: Mover los archivos del Correo al Expediente oficial
+                            if ($record->rutas_adjuntos) {
+                                foreach ($record->rutas_adjuntos as $ruta) {
+                                    \App\Models\ArchivoAdjunto::create([
+                                        'expediente_id' => $expediente->id,
+                                        'movimiento_id' => $movimiento->id, // Vinculado al primer paso
+                                        'nombre_archivo' => basename($ruta),
+                                        'ruta_archivo' => $ruta,
+                                        'es_respuesta_final' => false,
+                                    ]);
+                                }
+                            }
 
-                        // 3. Marcar el correo como procesado y vincularlo
-                        $record->update([
-                            'procesado' => true,
-                            'expediente_id' => $expediente->id,
-                        ]);
+                            // 3. Marcar el correo como procesado y vincularlo
+                            $record->update([
+                                'procesado' => true,
+                                'expediente_id' => $expediente->id,
+                            ]);
 
-                        // NOTA: La lógica para mover los archivos adjuntos a la tabla `archivos_adjuntos` iría aquí.
-                    });
-                })
-                ->successNotificationTitle('¡Expediente generado y derivado correctamente!'),
-                EditAction::make(),
+                            // NOTA: La lógica para mover los archivos adjuntos a la tabla `archivos_adjuntos` iría aquí.
+                        });
+                    })
+                    ->successNotificationTitle('¡Expediente generado y derivado correctamente!'),
+                //EditAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

@@ -14,6 +14,7 @@ class CorreoEntrante extends Model
         'asunto',
         'cuerpo_texto',
         'tiene_adjuntos',
+        'rutas_adjuntos',
         'procesado',
         'expediente_id',
         'fecha_recepcion_correo'
@@ -23,6 +24,7 @@ class CorreoEntrante extends Model
         'procesado' => 'boolean',
         'tiene_adjuntos' => 'boolean',
         'fecha_recepcion_correo' => 'datetime',
+        'rutas_adjuntos' => 'array',
     ];
 
     // si el correo ya fue convertido en un trámite se enlaza aquí

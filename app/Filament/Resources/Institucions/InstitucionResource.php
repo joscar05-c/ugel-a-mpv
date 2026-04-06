@@ -2,11 +2,13 @@
 
 namespace App\Filament\Resources\Institucions;
 
+use App\Filament\Resources\Cursos\RelationManagers\CompetenciasRelationManager;
 use App\Filament\Resources\Institucions\Pages\CreateInstitucion;
 use App\Filament\Resources\Institucions\Pages\EditInstitucion;
 use App\Filament\Resources\Institucions\Pages\ListInstitucions;
 use App\Filament\Resources\Institucions\Pages\ViewInstitucion;
 use App\Filament\Resources\Institucions\RelationManagers\DirectorRelationManager;
+use App\Filament\Resources\Institucions\RelationManagers\MatriculasRelationManager;
 use App\Filament\Resources\Institucions\Schemas\InstitucionForm;
 use App\Filament\Resources\Institucions\Schemas\InstitucionInfolist;
 use App\Filament\Resources\Institucions\Tables\InstitucionsTable;
@@ -44,6 +46,7 @@ class InstitucionResource extends Resource
     {
         return [
             DirectorRelationManager::class,
+            MatriculasRelationManager::class,
         ];
     }
 

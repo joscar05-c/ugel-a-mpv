@@ -3,17 +3,17 @@
 namespace App\Filament\Resources\Cursos\Pages;
 
 use App\Filament\Resources\Cursos\CursoResource;
-use Filament\Actions\CreateAction;
-use Filament\Resources\Pages\ManageRecords;
+use Filament\Actions\EditAction;
+use Filament\Resources\Pages\ViewRecord;
 
-class ManageCursos extends ManageRecords
+class ViewCurso extends ViewRecord
 {
     protected static string $resource = CursoResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            EditAction::make(),
         ];
     }
 }

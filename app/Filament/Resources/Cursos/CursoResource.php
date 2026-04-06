@@ -2,21 +2,19 @@
 
 namespace App\Filament\Resources\Cursos;
 
-use App\Filament\Resources\Cursos\Pages\ManageCursos;
+use App\Filament\Resources\Cursos\Pages\CreateCurso;
+use App\Filament\Resources\Cursos\Pages\EditCurso;
+use App\Filament\Resources\Cursos\Pages\ListCursos;
+use App\Filament\Resources\Cursos\Pages\ViewCurso;
+use App\Filament\Resources\Cursos\RelationManagers\CompetenciasRelationManager;
+use App\Filament\Resources\Cursos\Schemas\CursoForm;
+use App\Filament\Resources\Cursos\Schemas\CursoInfolist;
+use App\Filament\Resources\Cursos\Tables\CursosTable;
 use App\Models\Curso;
 use BackedEnum;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 class CursoResource extends Resource
@@ -29,70 +27,33 @@ class CursoResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Select::make('nivel_id')
-                    ->relationship('nivel', 'nombre')
-                    ->required(),
-                TextInput::make('nombre')
-                    ->required(),
-            ]);
+        return CursoForm::configure($schema);
     }
 
     public static function infolist(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                TextEntry::make('nivel_id')
-                    ->numeric(),
-                TextEntry::make('nombre'),
-                TextEntry::make('created_at')
-                    ->dateTime()
-                    ->placeholder('-'),
-                TextEntry::make('updated_at')
-                    ->dateTime()
-                    ->placeholder('-'),
-            ]);
+        return CursoInfolist::configure($schema);
     }
 
     public static function table(Table $table): Table
     {
-        return $table
-            ->recordTitleAttribute('nombre')
-            ->columns([
-                TextColumn::make('nivel_id')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('nombre')
-                    ->searchable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->filters([
-                //
-            ])
-            ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ]);
+        return CursosTable::configure($table);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            CompetenciasRelationManager::class,
+        ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => ManageCursos::route('/'),
+            'index' => ListCursos::route('/'),
+            'create' => CreateCurso::route('/create'),
+            'view' => ViewCurso::route('/{record}'),
+            'edit' => EditCurso::route('/{record}/edit'),
         ];
     }
 }

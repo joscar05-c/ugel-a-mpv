@@ -19,4 +19,10 @@ class Institucion extends Model
     public function director(){
         return $this->hasOne(Director::class);
     }
+
+    public function matriculas()
+    {
+        // Se especifica 'ie_id' porque no sigue la convención por defecto de Laravel
+        return $this->hasMany(MatriculaIE::class, 'ie_id');
+    }
 }

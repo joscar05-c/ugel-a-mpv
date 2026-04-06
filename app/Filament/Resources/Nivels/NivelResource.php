@@ -2,20 +2,20 @@
 
 namespace App\Filament\Resources\Nivels;
 
-use App\Filament\Resources\Nivels\Pages\ManageNivels;
+use App\Filament\Resources\Nivels\Pages\CreateNivel;
+use App\Filament\Resources\Nivels\Pages\EditNivel;
+use App\Filament\Resources\Nivels\Pages\ListNivels;
+use App\Filament\Resources\Nivels\Pages\ViewNivel;
+use App\Filament\Resources\Nivels\RelationManagers\CursosRelationManager;
+use App\Filament\Resources\Nivels\RelationManagers\GradosRelationManager;
+use App\Filament\Resources\Nivels\Schemas\NivelForm;
+use App\Filament\Resources\Nivels\Schemas\NivelInfolist;
+use App\Filament\Resources\Nivels\Tables\NivelsTable;
 use App\Models\Nivel;
 use BackedEnum;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
-use Filament\Forms\Components\TextInput;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 class NivelResource extends Resource
@@ -28,62 +28,34 @@ class NivelResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                TextInput::make('nombre')
-                    ->required(),
-            ]);
+        return NivelForm::configure($schema);
     }
 
     public static function infolist(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                TextEntry::make('nombre'),
-                TextEntry::make('created_at')
-                    ->dateTime()
-                    ->placeholder('-'),
-                TextEntry::make('updated_at')
-                    ->dateTime()
-                    ->placeholder('-'),
-            ]);
+        return NivelInfolist::configure($schema);
     }
 
     public static function table(Table $table): Table
     {
-        return $table
-            ->recordTitleAttribute('nombre')
-            ->columns([
-                TextColumn::make('nombre')
-                    ->searchable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->filters([
-                //
-            ])
-            ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ]);
+        return NivelsTable::configure($table);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            CursosRelationManager::class,
+            GradosRelationManager::class
+        ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => ManageNivels::route('/'),
+            'index' => ListNivels::route('/'),
+            'create' => CreateNivel::route('/create'),
+            'view' => ViewNivel::route('/{record}'),
+            'edit' => EditNivel::route('/{record}/edit'),
         ];
     }
 }

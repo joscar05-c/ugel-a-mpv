@@ -16,7 +16,8 @@ class Institucion extends Model
         'link_drive'
     ];
 
-    public function director(){
+    public function director()
+    {
         return $this->hasOne(Director::class);
     }
 
@@ -24,5 +25,9 @@ class Institucion extends Model
     {
         // Se especifica 'ie_id' porque no sigue la convención por defecto de Laravel
         return $this->hasMany(MatriculaIE::class, 'ie_id');
+    }
+    public function horarios()
+    {
+        return $this->hasMany(Horario::class, 'ie_id');
     }
 }

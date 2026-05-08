@@ -8,6 +8,7 @@ use App\Filament\Resources\Institucions\Pages\EditInstitucion;
 use App\Filament\Resources\Institucions\Pages\ListInstitucions;
 use App\Filament\Resources\Institucions\Pages\ViewInstitucion;
 use App\Filament\Resources\Institucions\RelationManagers\DirectorRelationManager;
+use App\Filament\Resources\Institucions\RelationManagers\HorariosRelationManager;
 use App\Filament\Resources\Institucions\RelationManagers\MatriculasRelationManager;
 use App\Filament\Resources\Institucions\Schemas\InstitucionForm;
 use App\Filament\Resources\Institucions\Schemas\InstitucionInfolist;
@@ -47,6 +48,7 @@ class InstitucionResource extends Resource
         return [
             DirectorRelationManager::class,
             MatriculasRelationManager::class,
+            HorariosRelationManager::class,
         ];
     }
 

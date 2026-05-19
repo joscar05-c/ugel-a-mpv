@@ -18,4 +18,9 @@ class Horario extends Model
         'curso',
         'docente',
     ];
+
+    public function institucion()
+    {
+        return $this->belongsTo(Institucion::class, 'ie_id');
+    }
 }
